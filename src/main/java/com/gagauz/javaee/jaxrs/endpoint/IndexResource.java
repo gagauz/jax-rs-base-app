@@ -1,7 +1,12 @@
 package com.gagauz.javaee.jaxrs.endpoint;
 
-import com.gagauz.javaee.jaxrs.bean.JaxbBean1;
+import com.gagauz.javaee.jaxrs.bean.SomeBean;
+import com.gagauz.javaee.jaxrs.services.SomeBeanService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
@@ -9,18 +14,24 @@ import javax.ws.rs.core.MediaType;
 @Path(value = "/index")
 public class IndexResource {
 
-    @GET
-    @Produces({ MediaType.TEXT_PLAIN })
-    @Consumes({ MediaType.WILDCARD })
-    public String getIt() {
-        return "Hi managed bean!";
-    }
+    private final Logger logger = LoggerFactory.getLogger(IndexResource.class);
+
+    @Inject
+    private SomeBeanService service;
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public JaxbBean1 getItJson(@QueryParam("name") @DefaultValue("Anonymous") String name,
+    @Consumes({ MediaType.WILDCARD })
+    public SomeBean getItJson(@QueryParam("name") @DefaultValue("Anonymous") String name,
             @QueryParam("age") @DefaultValue("10") int age) {
-        return new JaxbBean1(name, age);
+        logger.info("Handle request with name=" + name + ", age=" + age);
+        return service.getBean(name, age);
+    }
+
+    @POST
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({ MediaType.APPLICATION_JSON })
+    public SomeBean postItJson(@Valid SomeBean bean) {
+        return bean;
     }
 }

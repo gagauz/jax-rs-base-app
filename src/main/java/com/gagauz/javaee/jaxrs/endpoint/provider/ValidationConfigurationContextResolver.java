@@ -1,5 +1,6 @@
 package com.gagauz.javaee.jaxrs.endpoint.provider;
 
+
 import org.glassfish.jersey.server.validation.ValidationConfig;
 import org.glassfish.jersey.server.validation.internal.InjectingConstraintValidatorFactory;
 
@@ -11,7 +12,9 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 
 @Provider
 public class ValidationConfigurationContextResolver implements ContextResolver<ValidationConfig> {
@@ -21,15 +24,11 @@ public class ValidationConfigurationContextResolver implements ContextResolver<V
 
     @Override
     public ValidationConfig getContext(final Class<?> type) {
-        final ValidationConfig config = new ValidationConfig();
-        config.setConstraintValidatorFactory(resourceContext.getResource(InjectingConstraintValidatorFactory.class));
-        config.setParameterNameProvider(new CustomParameterNameProvider());
-        return config;
+        return new ValidationConfig()
+                .constraintValidatorFactory(resourceContext.getResource(InjectingConstraintValidatorFactory.class))
+                .parameterNameProvider(new CustomParameterNameProvider());
     }
 
-    /**
-     * See ContactCardTest#testAddInvalidContact.
-     */
     private class CustomParameterNameProvider implements ParameterNameProvider {
 
         private final ParameterNameProvider nameProvider;
